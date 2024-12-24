@@ -62,9 +62,9 @@ if __name__ == '__main__':
 
     parser.add_argument("--last_n_ticks", type=int, default=10,
                         help='How many ticks to include in the state (Current tick + last_n_ticks - 1 past ticks)')
-    parser.add_argument("--snapshot_size", type=int, default=10000,
+    parser.add_argument("--snapshot_size", type=int, default=50000,
                         help='Size of snapshots the agent will be trained on')
-    parser.add_argument("--snapshots_per_day", type=int, default=5,
+    parser.add_argument("--snapshots_per_day", type=int, default=25,
                         help='How many snapshots to create per training day')
     parser.add_argument("--tot_snapshots", type=int, default=25, help='How many snapshots to sample from all snapshots')
     parser.add_argument("--start_end_clip", type=int, default=int(200000),

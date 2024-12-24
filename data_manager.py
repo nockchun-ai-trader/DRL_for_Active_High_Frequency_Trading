@@ -42,25 +42,26 @@ class Data:
 
     def load_and_scale(self):
 
-        if os.path.exists(self.data_dir + "/maxes.csv"):
-            os.remove(self.data_dir + "/maxes.csv")
-        if os.path.exists(self.data_dir + "/mins.csv"):
-            os.remove(self.data_dir + "/mins.csv")
+        if os.path.exists(self.data_dir + "/train_maxes.csv"):
+            os.remove(self.data_dir + "/train_maxes.csv")
+        if os.path.exists(self.data_dir + "/train_mins.csv"):
+            os.remove(self.data_dir + "/train_mins.csv")
 
         for f in os.listdir(os.path.join(self.data_dir, 'train_data')):
-            self.min_max_scaling_compute(f)
+            if f.endswith('.csv'):
+                self.min_max_scaling_compute(f)
 
     def min_max_scaling_compute(self, filename):
-
-        df = copy.deepcopy(
-            pd.read_csv(os.path.join(os.path.join(self.data_dir, 'train_data'), filename), header=None).iloc[
-            self.start_end_clip:-self.start_end_clip, :]).reset_index(drop=True)
+        file_path=os.path.join(os.path.join(self.data_dir, 'train_data'), filename)
+        print(file_path)
+        data_csv=pd.read_csv(file_path, encoding='utf-8')
+        df = copy.deepcopy(data_csv).reset_index(drop=True)
 
         mins = pd.DataFrame().append(pd.Series(df.to_numpy().min(axis=0)), ignore_index=True)
         maxes = pd.DataFrame().append(pd.Series(df.to_numpy().max(axis=0)), ignore_index=True)
 
-        mins.to_csv(self.data_dir + '/mins.csv', index=False, header=False, mode='a')
-        maxes.to_csv(self.data_dir + '/maxes.csv', index=False, header=False, mode='a')
+        mins.to_csv(self.data_dir + '/train_mins.csv', index=False, header=False, mode='a')
+        maxes.to_csv(self.data_dir + '/train_maxes.csv', index=False, header=False, mode='a')
 
     def select_windows(self, df, k, n):
         # Compute drawdown and keep only the windows with the biggest ones
@@ -77,17 +78,19 @@ class Data:
 
     def load_unscaled_train_files(self):
         for filename in os.listdir(os.path.join(self.data_dir, 'train_data')):
-            df = copy.deepcopy(
-                pd.read_csv(os.path.join(os.path.join(self.data_dir, 'train_data'), filename), header=None).iloc[
-                self.start_end_clip:-self.start_end_clip, :].reset_index(drop=True))
-            df['mid_price'] = abs(df.iloc[:, 0] + df.iloc[:, 2]) / 2
-            self.select_windows(df, self.snapshot_size, self.snapshots_per_day)
+            if filename.endswith('.csv'):
+                df = copy.deepcopy(
+                    pd.read_csv(os.path.join(os.path.join(self.data_dir, 'train_data'), filename), header=None).iloc[
+                    self.start_end_clip:-self.start_end_clip, :].reset_index(drop=True))
+                df['mid_price'] = abs(df.iloc[:, 0] + df.iloc[:, 2]) / 2
+                self.select_windows(df, self.snapshot_size, self.snapshots_per_day)
 
     def load_test_file(self, i):
         filename = sorted(os.listdir(os.path.join(self.data_dir, 'test_data')))[i]
-        df = pd.read_csv(os.path.join(os.path.join(self.data_dir, 'test_data'), filename), header=None).iloc[
-             self.start_end_clip:-self.start_end_clip, :].reset_index(drop=True)
-        return filename, [scale(df), df]
+        if filename.endswith('.csv'):
+            df = pd.read_csv(os.path.join(os.path.join(self.data_dir, 'test_data'), filename), header=None).iloc[
+                self.start_end_clip:-self.start_end_clip, :].reset_index(drop=True)
+            return filename, [scale(df), df]
 
     def save_snapshots(self, indexes):
         for j, i in enumerate(indexes):
