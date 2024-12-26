@@ -66,7 +66,7 @@ if __name__ == '__main__':
                         help='Size of snapshots the agent will be trained on')
     parser.add_argument("--snapshots_per_day", type=int, default=25,
                         help='How many snapshots to create per training day')
-    parser.add_argument("--tot_snapshots", type=int, default=25, help='How many snapshots to sample from all snapshots')
+    parser.add_argument("--tot_snapshots", type=int, default=5, help='How many snapshots to sample from all snapshots')
     parser.add_argument("--start_end_clip", type=int, default=int(200000),
                         help='How many ticks to remove from the start and end of each day')
     parser.add_argument("--epochs", type=int, default=30, help='Epochs to train the agent on')

@@ -1,12 +1,10 @@
+
 import copy
 import enum
 from abc import ABC
 
-# import gymnasium as gym
-# # import gymnasium.spaces as space
-# from gymnasium import spaces 
 import gym
-from gym import spaces
+import gym.spaces as space
 import numpy as np
 
 
@@ -60,16 +58,16 @@ class StockEnv(gym.Env, ABC):
         self.done = False
         self.size = self.unscaled_data.shape[0]
 
-        g_spaces = {
-            'volumes': spaces.Box(low=0, high=1, shape=(1, 200)),
-            'position': spaces.Box(low=-1, high=1, shape=(1, 1))
+        spaces = {
+            'volumes': gym.spaces.Box(low=0, high=1, shape=(1, 200)),
+            'position': gym.spaces.Box(low=-1, high=1, shape=(1, 1))
         }
 
         if self.use_m_t_m:
-            g_spaces.update({'m_to_m': spaces.Box(low=0, high=1, shape=(1, 1))})
+            spaces.update({'m_to_m': gym.spaces.Box(low=0, high=1, shape=(1, 1))})
 
-        self.observation_space = spaces.Dict(g_spaces)
-        self.action_space = spaces.Discrete(4)
+        self.observation_space = gym.spaces.Dict(spaces)
+        self.action_space = space.Discrete(4)
 
     def step(self, action):
 
@@ -162,9 +160,6 @@ class StockEnv(gym.Env, ABC):
         self.sell_value = self.state_snapshot_unscaled.iloc[-1, 2]
         self.buy_value_scaled = self.state_snapshot_scaled.iloc[-1, 0]
         self.sell_value_scaled = self.state_snapshot_scaled.iloc[-1, 2]
-        # print('state:', self.state)
-        # print('state_snapshot_scaled:', self.state_snapshot_scaled)
-        # print()
 
     def create_state(self):
 
@@ -175,5 +170,5 @@ class StockEnv(gym.Env, ABC):
             self.m_to_m = compute_m_to_m(self.position, self.price_scaled, self.buy_value_scaled,
                                          self.sell_value_scaled)
             state.update({'m_to_m': np.expand_dims(np.array([self.m_to_m]), axis=1)})
-        
+
         return state

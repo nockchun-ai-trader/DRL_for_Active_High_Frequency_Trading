@@ -86,11 +86,13 @@ class Data:
                 self.select_windows(df, self.snapshot_size, self.snapshots_per_day)
 
     def load_test_file(self, i):
-        filename = sorted(os.listdir(os.path.join(self.data_dir, 'test_data')))[i]
-        if filename.endswith('.csv'):
-            df = pd.read_csv(os.path.join(os.path.join(self.data_dir, 'test_data'), filename), header=None).iloc[
-                self.start_end_clip:-self.start_end_clip, :].reset_index(drop=True)
-            return filename, [scale(df), df]
+        files_in_dir = os.listdir(os.path.join(self.data_dir, 'test_data'))
+        test_files = [f for f in files_in_dir if f.endswith('.csv')]
+        filename = sorted(test_files)[i]
+        # if filename.endswith('.csv'):
+        df = pd.read_csv(os.path.join(os.path.join(self.data_dir, 'test_data'), filename), header=None).iloc[
+            self.start_end_clip:-self.start_end_clip, :].reset_index(drop=True)
+        return filename, [scale(df), df]
 
     def save_snapshots(self, indexes):
         for j, i in enumerate(indexes):
